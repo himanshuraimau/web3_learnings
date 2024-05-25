@@ -30,3 +30,16 @@ CLI (Command Line Interface) wallets provide a straightforward and efficient way
    - CLI wallets often benefit from active community support and extensive documentation, making it easier for users to troubleshoot issues, seek assistance, and stay updated on the latest developments.
 
 
+
+
+# Download the Solana install script
+
+sh -c "$(curl -sSfL https://release.solana.com/stable/install)"
+
+# Update your PATH environment variable
+
+export PATH="/home/your-username/.local/share/solana/install/active_release/bin:$PATH"
+
+# Verify installation
+
+solana --version

@@ -11,9 +11,11 @@
   "description": "",
   "dependencies": {
     "@solana-developers/helpers": "^2.3.0",
+    "@solana/spl-name-service": "^0.2.1",
     "@solana/web3.js": "^1.94.0",
     "dotenv": "^16.4.5",
     "esrun": "^3.2.26",
+    "js-sha256": "^0.11.0",
     "typescript": "^5.5.3"
   }
 }

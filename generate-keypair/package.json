@@ -17,5 +17,8 @@
     "esrun": "^3.2.26",
     "js-sha256": "^0.11.0",
     "typescript": "^5.5.3"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.10"
   }
 }

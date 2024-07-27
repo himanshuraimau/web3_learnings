@@ -11,7 +11,7 @@ export async function GET(request:Request){
   }
     return Response.json(payload,{
       headers:ACTIONS_CORS_HEADERS,
-      status:201
+      status:400
     });
 }
 

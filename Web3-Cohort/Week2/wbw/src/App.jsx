@@ -1,9 +1,8 @@
-import './App.css'
 import WalletGenerator from './Components/Wallet'
 
 function App() {
           return (
-            <div className="app">
+            <div>
               <WalletGenerator/>
             </div>
           )

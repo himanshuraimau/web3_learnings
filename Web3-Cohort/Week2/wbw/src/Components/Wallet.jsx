@@ -42,7 +42,7 @@ const WalletGenerator = () => {
 
   return (
     <div className={`${theme === 'light' ? 'bg-gray-100 text-gray-800' : 'bg-gray-900 text-gray-100'} min-h-screen flex flex-col items-center justify-center font-sans p-4`}>
-      <h1 className="mb-10 text-3xl md:text-5xl font-extrabold text-center">Web Wallet Generator</h1>
+      <h1 className="mb-10 text-3xl md:text-5xl font-extrabold text-center pt-20">Web Wallet Generator</h1>
 
       <div className="w-full max-w-lg">
         <div className="flex flex-col items-center mb-10">

@@ -1,40 +1,13 @@
 import React, { useState } from 'react';
-import styled, { createGlobalStyle, ThemeProvider } from 'styled-components';
-import { ethers } from 'ethers'; // Ensure ethers is imported
-
-const GlobalStyle = createGlobalStyle`
-  body {
-    background-color: ${({ theme }) => theme.body};
-    color: ${({ theme }) => theme.text};
-    transition: background-color 0.3s, color 0.3s;
-    margin: 0;
-    font-family: Arial, sans-serif;
-  }
-`;
-
-const theme = {
-  light: {
-    body: '#fff',
-    text: '#333',
-    primary: '#4CAF50',
-    secondary: '#007bff',
-  },
-  dark: {
-    body: '#222',
-    text: '#fff',
-    primary: '#4CAF50',
-    secondary: '#007bff',
-  },
-};
 
 const WalletGenerator = () => {
   const [mnemonic, setMnemonic] = useState('');
   const [wallets, setWallets] = useState([]);
   const [inputMnemonic, setInputMnemonic] = useState('');
-  const [currentTheme, setCurrentTheme] = useState('light');
+  const [theme, setTheme] = useState('light');
 
   const generateMnemonic = () => {
-    const newMnemonic = ethers.Wallet.createRandom().mnemonic.phrase;
+    const newMnemonic = window.ethers.Wallet.createRandom().mnemonic.phrase;
     setMnemonic(newMnemonic);
     setInputMnemonic('');
   };
@@ -47,7 +20,7 @@ const WalletGenerator = () => {
       return;
     }
 
-    const newWallet = ethers.Wallet.fromMnemonic(mnemo, `m/44'/60'/0'/0/${wallets.length}`);
+    const newWallet = window.ethers.Wallet.fromMnemonic(mnemo, `m/44'/60'/0'/0/${wallets.length}`);
     setWallets([...wallets, newWallet]);
   };
 
@@ -56,144 +29,92 @@ const WalletGenerator = () => {
   };
 
   const toggleTheme = () => {
-    setCurrentTheme(currentTheme === 'light' ? 'dark' : 'light');
+    setTheme(theme === 'light' ? 'dark' : 'light');
+  };
+
+  const copyToClipboard = (text) => {
+    navigator.clipboard.writeText(text);
+    alert('Copied to clipboard!');
   };
 
   return (
-    <ThemeProvider theme={theme[currentTheme]}>
-      <GlobalStyle />
-      <Container>
-        <Title>Web Based Wallet</Title>
+    <div className={`${theme === 'light' ? 'bg-gray-100 text-gray-800' : 'bg-gray-900 text-gray-100'} min-h-screen flex flex-col items-center justify-center font-sans`}>
+      <h1 className="mb-8 text-4xl font-bold">Web Based Wallet</h1>
 
-        <MnemonicSection>
-          <GenerateButton onClick={generateMnemonic}>Generate Mnemonic</GenerateButton>
-          {mnemonic && <MnemonicText>Mnemonic: {mnemonic}</MnemonicText>}
-        </MnemonicSection>
+      <div className="mb-8">
+        <button
+          onClick={generateMnemonic}
+          className="px-6 py-3 text-lg text-white bg-green-500 rounded-lg hover:bg-green-600 transition-colors"
+        >
+          Generate Mnemonic
+        </button>
+        {mnemonic && (
+          <div className="mt-4">
+            <p className="italic">Mnemonic: {mnemonic}</p>
+            <button
+              onClick={() => copyToClipboard(mnemonic)}
+              className="mt-2 px-4 py-2 text-sm text-white bg-gray-600 rounded-lg hover:bg-gray-700 transition-colors"
+            >
+              Copy Mnemonic
+            </button>
+          </div>
+        )}
+      </div>
 
-        <InputSection>
-          <Input
-            type="text"
-            placeholder="Input your mnemonic"
-            value={inputMnemonic}
-            onChange={handleMnemonicChange}
-          />
-        </InputSection>
+      <div className="mb-8">
+        <input
+          type="text"
+          placeholder="Input your mnemonic"
+          value={inputMnemonic}
+          onChange={handleMnemonicChange}
+          className={`px-4 py-2 w-72 border ${theme === 'light' ? 'border-gray-300' : 'border-gray-600'} rounded-lg bg-white text-gray-800`}
+        />
+      </div>
 
-        <CreateButton onClick={createWallet}>Create Wallet</CreateButton>
+      <button
+        onClick={createWallet}
+        className="px-6 py-3 text-lg text-white bg-blue-500 rounded-lg hover:bg-blue-600 transition-colors"
+      >
+        Create Wallet
+      </button>
 
-        <WalletList>
-          {wallets.map((wallet, index) => (
-            <WalletItem key={index}>
-              <strong>Wallet {index + 1}</strong>
-              <p>Public Key: {wallet.publicKey}</p>
-              <p>Address: {wallet.address}</p>
-            </WalletItem>
-          ))}
-        </WalletList>
+      <div className="mt-8 space-y-4 w-full max-w-md">
+        {wallets.map((wallet, index) => (
+          <div
+            key={index}
+            className={`p-4 rounded-lg ${theme === 'light' ? 'bg-white border border-gray-300' : 'bg-gray-800 border border-gray-600'}`}
+          >
+            <strong>Wallet {index + 1}</strong>
+            <p>Public Key: {wallet.publicKey}</p>
+            <button
+              onClick={() => copyToClipboard(wallet.publicKey)}
+              className="mt-2 px-4 py-2 text-sm text-white bg-gray-600 rounded-lg hover:bg-gray-700 transition-colors"
+            >
+              Copy Public Key
+            </button>
+            <p>Address: {wallet.address}</p>
+            <button
+              onClick={() => copyToClipboard(wallet.address)}
+              className="mt-2 px-4 py-2 text-sm text-white bg-gray-600 rounded-lg hover:bg-gray-700 transition-colors"
+            >
+              Copy Address
+            </button>
+          </div>
+        ))}
+      </div>
 
-        <ThemeToggle onClick={toggleTheme}>
-          {currentTheme === 'light' ? 'Switch to Dark Mode' : 'Switch to Light Mode'}
-        </ThemeToggle>
-      </Container>
-    </ThemeProvider>
+      <button
+        onClick={toggleTheme}
+        className="mt-8 px-6 py-3 text-lg text-white bg-gray-800 rounded-lg hover:bg-gray-700 transition-colors"
+      >
+        {theme === 'light' ? 'Dark Mode' : 'Light Mode'}
+      </button>
+
+      <footer className={`${theme === 'light' ? 'bg-gray-100' : 'bg-gray-900'} mt-auto py-4 border-t w-full text-center`}>
+        Created by Himanshu!
+      </footer>
+    </div>
   );
 };
 
 export default WalletGenerator;
-
-// Styled Components
-const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 20px;
-  background-color: ${({ theme }) => theme.body};
-  min-height: 100vh;
-`;
-
-const Title = styled.h1`
-  font-size: 2em;
-  margin-bottom: 20px;
-  color: ${({ theme }) => theme.text};
-`;
-
-const MnemonicSection = styled.div`
-  display: flex;
-  align-items: center;
-  margin-bottom: 20px;
-`;
-
-const GenerateButton = styled.button`
-  background-color: ${({ theme }) => theme.primary};
-  border: none;
-  color: white;
-  padding: 10px 20px;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  font-size: 16px;
-  margin-right: 10px;
-  cursor: pointer;
-  border-radius: 5px;
-  transition: background-color 0.3s;
-
-  &:hover {
-    background-color: ${({ theme }) => theme.primary + 'CC'}; /* Slightly darker primary color */
-  }
-`;
-
-const MnemonicText = styled.p`
-  font-style: italic;
-  color: ${({ theme }) => theme.text};
-`;
-
-const InputSection = styled.div`
-  margin-bottom: 20px;
-`;
-
-const Input = styled.input`
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  width: 300px;
-  background-color: ${({ theme }) => theme.body};
-  color: ${({ theme }) => theme.text};
-`;
-
-const CreateButton = styled(GenerateButton)`
-  background-color: ${({ theme }) => theme.secondary};
-
-  &:hover {
-    background-color: ${({ theme }) => theme.secondary + 'CC'}; /* Slightly darker secondary color */
-  }
-`;
-
-const WalletList = styled.div`
-  margin-top: 20px;
-  width: 100%;
-`;
-
-const WalletItem = styled.div`
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  padding: 10px;
-  margin-bottom: 10px;
-  background-color: ${({ theme }) => theme.body};
-  color: ${({ theme }) => theme.text};
-`;
-
-const ThemeToggle = styled.button`
-  background: none;
-  border: none;
-  color: ${({ theme }) => theme.text};
-  cursor: pointer;
-  font-size: 16px;
-  margin-top: 20px;
-  padding: 10px;
-  border-radius: 5px;
-  transition: background-color 0.3s;
-
-  &:hover {
-    background-color: ${({ theme }) => theme.text + '20'}; /* Slightly lighter text color */
-  }
-`;

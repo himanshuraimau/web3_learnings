@@ -1,6 +1,6 @@
 import { Keypair, SystemProgram, Transaction } from "@solana/web3.js";
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
-import { TOKEN_2022_PROGRAM_ID, getMintLen, createInitializeMetadataPointerInstruction, createInitializeMintInstruction, TYPE_SIZE, LENGTH_SIZE, ExtensionType } from "@solana/spl-token"
+import { MINT_SIZE, TOKEN_2022_PROGRAM_ID, createMintToInstruction, createAssociatedTokenAccountInstruction, getMintLen, createInitializeMetadataPointerInstruction, createInitializeMintInstruction, TYPE_SIZE, LENGTH_SIZE, ExtensionType, mintTo, getOrCreateAssociatedTokenAccount, getAssociatedTokenAddressSync } from "@solana/spl-token"
 import { createInitializeInstruction, pack } from '@solana/spl-token-metadata';
 
 
@@ -50,9 +50,39 @@ export function TokenLaunchpad() {
         transaction.partialSign(mintKeypair);
 
         await wallet.sendTransaction(transaction, connection);
+
+        console.log(`Token mint created at ${mintKeypair.publicKey.toBase58()}`);
+        const associatedToken = getAssociatedTokenAddressSync(
+            mintKeypair.publicKey,
+            wallet.publicKey,
+            false,
+            TOKEN_2022_PROGRAM_ID,
+        );
+
+        console.log(associatedToken.toBase58());
+
+        const transaction2 = new Transaction().add(
+            createAssociatedTokenAccountInstruction(
+                wallet.publicKey,
+                associatedToken,
+                wallet.publicKey,
+                mintKeypair.publicKey,
+                TOKEN_2022_PROGRAM_ID,
+            ),
+        );
+
+        await wallet.sendTransaction(transaction2, connection);
+
+        const transaction3 = new Transaction().add(
+            createMintToInstruction(mintKeypair.publicKey, associatedToken, wallet.publicKey, 1000000000, [], TOKEN_2022_PROGRAM_ID)
+        );
+
+        await wallet.sendTransaction(transaction3, connection);
+
+        console.log("Minted!")
     }
 
-    return <div style={{
+    return  <div style={{
         height: '100vh',
         display: 'flex',
         justifyContent: 'center',

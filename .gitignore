@@ -1,4 +1,5 @@
 .env
 .node_modules
 
-sol_
+sol_contr/target
+target
